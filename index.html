@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بازی سودوکو برای کودکان</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* استایل‌های کلی صفحه */
+        :root {
+            --bg-gradient-start: #e0f7fa;
+            --bg-gradient-end: #f0f8ff;
+            --board-bg: #ffffff;
+            --border-color: #b3e5fc;
+            --dark-border-color: #0288d1;
+            --button-bg-start: #4fc3f7;
+            --button-bg-end: #29b6f6;
+            --button-hover-start: #29b6f6;
+            --button-hover-end: #03a9f4;
+            --action-btn-start: #81c784;
+            --action-btn-end: #66bb6a;
+            --action-btn-hover-start: #66bb6a;
+            --action-btn-hover-end: #4caf50;
+            --home-btn-bg: #ffffff;
+            --home-btn-icon: #0288d1;
+            --red: #ef5350;
+            --green: #66bb6a;
+            --blue: #42a5f5;
+            --yellow: #ffee58;
+            --font-family: 'Vazirmatn', sans-serif;
+            --selection-bg: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: var(--dark-border-color);
+            text-shadow: 1px 1px 2px #cce4f8;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        #selection-screen {
+            background-color: var(--selection-bg);
+            padding: clamp(1.5rem, 5vw, 2.5rem);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px var(--shadow-color);
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        #difficulty-selection, #type-selection {
+            margin-bottom: 1.5rem;
+        }
+
+        #selection-screen h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+        
+        .selection-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        .selection-buttons button {
+            width: 90%;
+            max-width: 280px;
+        }
+
+        button {
+            font-family: var(--font-family);
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(145deg, var(--button-bg-start), var(--button-bg-end));
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 8px var(--shadow-color);
+        }
+
+        button:hover {
+            background: linear-gradient(145deg, var(--button-hover-start), var(--button-hover-end));
+            transform: translateY(-3px);
+            box-shadow: 0 7px 14px rgba(0, 0, 0, 0.15);
+        }
+        
+        .actions {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        }
+
+        button.action-btn {
+             background: linear-gradient(145deg, var(--action-btn-start), var(--action-btn-end));
+             width: clamp(180px, 50vw, 220px);
+        }
+        button.action-btn:hover {
+            background: linear-gradient(145deg, var(--action-btn-hover-start), var(--action-btn-hover-end));
+        }
+        
+        #back-btn {
+            background: var(--home-btn-bg);
+            border: 2px solid var(--border-color);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+         #back-btn:hover {
+            border-color: var(--dark-border-color);
+            background: #f1faff;
+         }
+        #back-btn svg {
+            fill: var(--home-btn-icon);
+            width: 30px;
+            height: 30px;
+            transition: transform 0.2s;
+        }
+        #back-btn:hover svg {
+            transform: scale(1.1);
+        }
+
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        #game-board {
+            display: grid;
+            border: 3px solid var(--dark-border-color);
+            background-color: var(--board-bg);
+            border-radius: 10px;
+            padding: 5px;
+            box-shadow: 0 8px 15px var(--shadow-color);
+            width: min(90vw, 450px);
+            aspect-ratio: 1 / 1;
+        }
+
+        .cell {
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            position: relative;
+        }
+        
+        .cell.empty-cell:hover {
+            background-color: #eaf5ff;
+        }
+
+        .cell.pre-filled {
+            cursor: not-allowed;
+            background-color: #f8f8f8;
+        }
+        
+        .board-3x3 .cell:nth-child(3n) { border-right-width: 2px; border-right-color: var(--dark-border-color); }
+        .board-3x3 .cell:nth-child(n+7) { border-bottom-width: 2px; border-bottom-color: var(--dark-border-color); }
+        .board-3x3 .cell:nth-child(-n+3) { border-top-width: 2px; border-top-color: var(--dark-border-color); }
+        .board-3x3 .cell:nth-child(3n+1) { border-left-width: 2px; border-left-color: var(--dark-border-color); }
+        
+        .board-4x4 .cell:nth-child(4n) { border-right-width: 2px; border-right-color: var(--dark-border-color); }
+        .board-4x4 .cell:nth-child(2),
+        .board-4x4 .cell:nth-child(6),
+        .board-4x4 .cell:nth-child(10),
+        .board-4x4 .cell:nth-child(14) { border-right-width: 2px; border-right-color: var(--dark-border-color); }
+        
+        .board-4x4 .cell:nth-child(n+5):nth-child(-n+8) { border-bottom-width: 2px; border-bottom-color: var(--dark-border-color); }
+        .board-4x4 .cell:nth-child(n+13) { border-bottom-width: 2px; border-bottom-color: var(--dark-border-color); }
+
+        .board-4x4 .cell:nth-child(-n+4) { border-top-width: 2px; border-top-color: var(--dark-border-color); }
+        .board-4x4 .cell:nth-child(4n+1) { border-left-width: 2px; border-left-color: var(--dark-border-color); }
+
+        #toolbox {
+            display: flex;
+            gap: 15px;
+            padding: 10px;
+            background: var(--board-bg);
+            border-radius: 15px;
+            box-shadow: 0 4px 8px var(--shadow-color);
+        }
+
+        .tool {
+            width: clamp(40px, 12vw, 50px);
+            height: clamp(40px, 12vw, 50px);
+            cursor: pointer;
+            border-radius: 8px;
+            border: 3px solid transparent;
+            transition: transform 0.2s, border-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tool:hover {
+            transform: scale(1.1);
+        }
+
+        .tool.selected {
+            border-color: var(--dark-border-color);
+            transform: scale(1.15);
+        }
+        
+        /* --- بازنویسی کامل و قدرتمند بخش نمایش شکل‌ها --- */
+        .shape {
+            width: 70%;
+            height: 70%;
+        }
+
+        /* مربع‌ها */
+        .square-red    { background-color: var(--red); border-radius: 15%; }
+        .square-green  { background-color: var(--green); border-radius: 15%; }
+        .square-blue   { background-color: var(--blue); border-radius: 15%; }
+        .square-yellow { background-color: var(--yellow); border-radius: 15%; }
+
+        /* دایره‌ها */
+        .circle-red   { background-color: var(--red); border-radius: 50%; }
+        .circle-green { background-color: var(--green); border-radius: 50%; }
+        .circle-blue  { background-color: var(--blue); border-radius: 50%; }
+
+        /* مثلث‌ها */
+        .triangle-red   { background-color: var(--red); clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+        .triangle-green { background-color: var(--green); clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+        .triangle-blue  { background-color: var(--blue); clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+        
+        /* انیمیشن‌ها و پیام‌ها */
+        .shake { animation: shake 0.5s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        #message {
+            margin-top: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            height: 30px;
+            transition: color 0.3s, opacity 0.3s;
+        }
+        #message.success { color: var(--green); }
+        #message.error { color: var(--red); }
+    </style>
+</head>
+<body>
+
+    <h1>بازی سودوکو برای کودکان</h1>
+    
+    <div id="selection-screen">
+        <div id="difficulty-selection">
+            <h2>یک سطح را انتخاب کنید:</h2>
+            <div class="selection-buttons">
+                <button class="difficulty-btn" data-difficulty="easy">آسان</button>
+                <button class="difficulty-btn" data-difficulty="medium">متوسط</button>
+                <button class="difficulty-btn" data-difficulty="hard">سخت</button>
+            </div>
+        </div>
+        <div id="type-selection" style="display: none;">
+            <h2>نوع جدول را انتخاب کنید:</h2>
+            <div class="selection-buttons">
+                <button class="type-btn" data-type="shapes">جدول شکل‌ها (۳x۳)</button>
+                <button class="type-btn" data-type="colors">جدول رنگ‌ها (۴x۴)</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-container" style="display: none;">
+        <div id="game-board"></div>
+        <div id="toolbox"></div>
+        <div class="actions" id="action-buttons">
+            <button class="action-btn" id="check-btn">بررسی جواب</button>
+            <button class="action-btn" id="restart-btn">یک پازل دیگر</button>
+            <button id="back-btn" title="بازگشت به منو">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div id="message"></div>
+
+    <script>
+        // --- انتخاب عناصر HTML ---
+        const gameBoard = document.getElementById('game-board');
+        const toolbox = document.getElementById('toolbox');
+        const messageEl = document.getElementById('message');
+        const gameContainer = document.getElementById('game-container');
+        const selectionScreen = document.getElementById('selection-screen');
+        const difficultySelection = document.getElementById('difficulty-selection');
+        const typeSelection = document.getElementById('type-selection');
+        const checkBtn = document.getElementById('check-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const backBtn = document.getElementById('back-btn');
+
+        // --- متغیرهای وضعیت بازی ---
+        let selectedDifficulty = null;
+        let selectedType = null;
+        let selectedTool = null;
+        let solution = [];
+        let userBoard = [];
+
+        // --- پایگاه داده پازل‌ها ---
+        const puzzles = {
+            easy: {
+                shapes: [
+                    { board: ['r-t', 0, 0, 'b-s', 'r-t', 0, 0, 'b-s', 'r-t'], solution: ['r-t', 'g-c', 'b-s', 'b-s', 'r-t', 'g-c', 'g-c', 'b-s', 'r-t'] },
+                    { board: [0, 'g-c', 'b-s', 0, 'r-t', 'g-c', 'g-c', 0, 0], solution: ['r-t', 'g-c', 'b-s', 'b-s', 'r-t', 'g-c', 'g-c', 'b-s', 'r-t'] },
+                    { board: ['r-t', 'g-c', 'b-s', 'b-s', 0, 0, 0, 'b-s', 0], solution: ['r-t', 'g-c', 'b-s', 'b-s', 'r-t', 'g-c', 'g-c', 'b-s', 'r-t'] }
+                ],
+                colors: [
+                    { board: ['g', 0, 'y', 'b', 'b', 'y', 0, 'g', 'r', 'g', 'b', 0, 0, 'b', 'g', 'r'], solution: ['g', 'r', 'y', 'b', 'b', 'y', 'r', 'g', 'r', 'g', 'b', 'y', 'y', 'b', 'g', 'r'] },
+                    { board: [0, 'r', 'y', 'b', 0, 'y', 'r', 'g', 'r', 'g', 0, 'y', 'y', 0, 'g', 'r'], solution: ['g', 'r', 'y', 'b', 'b', 'y', 'r', 'g', 'r', 'g', 'b', 'y', 'y', 'b', 'g', 'r'] },
+                    { board: ['g', 'r', 0, 0, 'b', 0, 'r', 'g', 0, 'g', 'b', 'y', 'y', 'b', 0, 'r'], solution: ['g', 'r', 'y', 'b', 'b', 'y', 'r', 'g', 'r', 'g', 'b', 'y', 'y', 'b', 'g', 'r'] }
+                ]
+            },
+            medium: {
+                shapes: [
+                    { board: [0, 'g-c', 0, 'b-s', 0, 'g-c', 0, 'b-s', 0], solution: ['r-t', 'g-c', 'b-s', 'b-s', 'r-t', 'g-c', 'g-c', 'b-s', 'r-t'] },
+                    { board: ['r-t', 0, 'b-s', 0, 'r-t', 0, 'g-c', 0, 'r-t'], solution: ['r-t', 'g-c', 'b-s', 'b-s', 'r-t', 'g-c', 'g-c', 'b-s', 'r-t'] },
+                    { board: [0, 0, 'b-s', 'b-s', 'r-t', 0, 'g-c', 0, 0], solution: ['r-t', 'g-c', 'b-s', 'b-s', 'r-t', 'g-c', 'g-c', 'b-s', 'r-t'] }
+                ],
+                colors: [
+                    { board: [0, 'r', 'y', 0, 'b', 0, 0, 'g', 0, 'g', 'b', 0, 'y', 0, 0, 'r'], solution: ['g', 'r', 'y', 'b', 'b', 'y', 'r', 'g', 'r', 'g', 'b', 'y', 'y', 'b', 'g', 'r'] },
+                    { board: ['r', 0, 'b', 0, 'g', 'b', 0, 0, 0, 'r', 'g', 'b', 'b', 0, 0, 'y'], solution: ['r', 'y', 'b', 'g', 'g', 'b', 'y', 'r', 'y', 'r', 'g', 'b', 'b', 'g', 'r', 'y'] },
+                    { board: [0, 0, 'b', 'g', 'g', 0, 'y', 0, 0, 'r', 0, 'b', 'b', 'g', 0, 0], solution: ['r', 'y', 'b', 'g', 'g', 'b', 'y', 'r', 'y', 'r', 'g', 'b', 'b', 'g', 'r', 'y'] }
+                ]
+            },
+            hard: {
+                 shapes: [
+                    { board: [0, 'g-c', 0, 'b-s', 0, 0, 0, 'b-s', 0], solution: ['r-t', 'g-c', 'b-s', 'b-s', 'r-t', 'g-c', 'g-c', 'b-s', 'r-t'] },
+                    { board: [0, 0, 'b-s', 0, 'r-t', 0, 'g-c', 0, 0], solution: ['r-t', 'g-c', 'b-s', 'b-s', 'r-t', 'g-c', 'g-c', 'b-s', 'r-t'] },
+                    { board: ['r-t', 0, 0, 0, 0, 'g-c', 0, 0, 'r-t'], solution: ['r-t', 'g-c', 'b-s', 'b-s', 'r-t', 'g-c', 'g-c', 'b-s', 'r-t'] }
+                ],
+                colors: [
+                    { board: [0, 'r', 0, 0, 'b', 0, 0, 'g', 0, 0, 'b', 0, 'y', 0, 0, 'r'], solution: ['g', 'r', 'y', 'b', 'b', 'y', 'r', 'g', 'r', 'g', 'b', 'y', 'y', 'b', 'g', 'r'] },
+                    { board: [0, 'y', 'b', 0, 'g', 0, 0, 'r', 0, 0, 'g', 0, 0, 'g', 'r', 0], solution: ['r', 'y', 'b', 'g', 'g', 'b', 'y', 'r', 'y', 'r', 'g', 'b', 'b', 'g', 'r', 'y'] },
+                    { board: ['g', 0, 0, 'b', 0, 'y', 'r', 0, 0, 'g', 'b', 0, 'y', 0, 0, 'r'], solution: ['g', 'r', 'y', 'b', 'b', 'y', 'r', 'g', 'r', 'g', 'b', 'y', 'y', 'b', 'g', 'r'] }
+                ]
+            }
+        };
+
+        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                selectedDifficulty = e.target.dataset.difficulty;
+                difficultySelection.style.display = 'none';
+                typeSelection.style.display = 'block';
+                typeSelection.classList.add('fade-in');
+            });
+        });
+
+        document.querySelectorAll('.type-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                selectedType = e.target.dataset.type;
+                startGame();
+            });
+        });
+
+        restartBtn.addEventListener('click', startGame);
+        checkBtn.addEventListener('click', checkSolution);
+        backBtn.addEventListener('click', showMenu);
+        
+        function startGame() {
+            const puzzlePool = puzzles[selectedDifficulty][selectedType];
+            const randomIndex = Math.floor(Math.random() * puzzlePool.length);
+            const puzzleData = puzzlePool[randomIndex];
+            
+            solution = [...puzzleData.solution];
+            userBoard = [...puzzleData.board];
+            selectedTool = null;
+            messageEl.textContent = '';
+            messageEl.className = '';
+
+            selectionScreen.style.display = 'none';
+            gameContainer.style.display = 'flex';
+            gameContainer.classList.add('fade-in');
+            
+            const gridSize = selectedType === 'shapes' ? 3 : 4;
+            const tools = selectedType === 'shapes' ? ['r-t', 'g-c', 'b-s'] : ['r', 'g', 'b', 'y'];
+
+            renderBoard(gridSize);
+            renderToolbox(tools);
+        }
+
+        function showMenu() {
+            gameContainer.style.display = 'none';
+            messageEl.textContent = '';
+            selectionScreen.style.display = 'block';
+            difficultySelection.style.display = 'block';
+            typeSelection.style.display = 'none';
+            selectionScreen.classList.add('fade-in');
+            selectedDifficulty = null;
+            selectedType = null;
+        }
+
+        function renderBoard(gridSize) {
+            gameBoard.innerHTML = '';
+            gameBoard.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+            gameBoard.className = `board-${gridSize}x${gridSize}`;
+
+            userBoard.forEach((item, index) => {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.index = index;
+                if (item !== 0) {
+                    cell.classList.add('pre-filled');
+                    cell.innerHTML = createShapeHtml(item);
+                } else {
+                    cell.classList.add('empty-cell');
+                    cell.addEventListener('click', handleCellClick);
+                }
+                gameBoard.appendChild(cell);
+            });
+        }
+        
+        function renderToolbox(tools) {
+            toolbox.innerHTML = '';
+            tools.forEach(toolId => {
+                const toolElement = document.createElement('div');
+                toolElement.classList.add('tool');
+                toolElement.dataset.toolId = toolId;
+                toolElement.innerHTML = createShapeHtml(toolId);
+                toolElement.addEventListener('click', handleToolClick);
+                toolbox.appendChild(toolElement);
+            });
+        }
+
+        function handleToolClick(e) {
+            const clickedTool = e.currentTarget;
+            selectedTool = clickedTool.dataset.toolId;
+            document.querySelectorAll('.tool').forEach(t => t.classList.remove('selected'));
+            clickedTool.classList.add('selected');
+        }
+
+        function handleCellClick(e) {
+            if (!selectedTool) {
+                toolbox.classList.add('shake');
+                setTimeout(() => toolbox.classList.remove('shake'), 500);
+                return;
+            }
+            const cell = e.currentTarget;
+            const index = parseInt(cell.dataset.index);
+            userBoard[index] = selectedTool;
+            cell.innerHTML = createShapeHtml(selectedTool);
+        }
+
+        function checkSolution() {
+            let isCorrect = true;
+            for (let i = 0; i < userBoard.length; i++) {
+                if (userBoard[i] === 0 || userBoard[i] !== solution[i]) {
+                    isCorrect = false;
+                    break;
+                }
+            }
+            if (isCorrect) {
+                messageEl.textContent = 'آفرین! شما برنده شدید!';
+                messageEl.className = 'success';
+            } else {
+                messageEl.textContent = 'اشتباهه! دوباره تلاش کن.';
+                messageEl.className = 'error';
+                gameBoard.classList.add('shake');
+                setTimeout(() => gameBoard.classList.remove('shake'), 500);
+            }
+        }
+
+        // --- بازنویسی کامل و قدرتمند تابع ساخت شکل‌ها ---
+        function createShapeHtml(id) {
+            if (id === 0) return '';
+            
+            let shapeClass = '';
+
+            if (!id.includes('-')) {
+                // برای جدول رنگ‌ها (۴x۴)
+                const colorMap = { 'r': 'red', 'g': 'green', 'b': 'blue', 'y': 'yellow' };
+                shapeClass = `square-${colorMap[id]}`;
+            } else {
+                // برای جدول شکل‌ها (۳x۳)
+                const [colorCode, shapeCode] = id.split('-');
+                const colorMap = { 'r': 'red', 'g': 'green', 'b': 'blue' };
+                const shapeMap = { 't': 'triangle', 'c': 'circle', 's': 'square' };
+                const color = colorMap[colorCode];
+                const shape = shapeMap[shapeCode];
+                shapeClass = `${shape}-${color}`;
+            }
+            
+            return `<div class="shape ${shapeClass}"></div>`;
+        }
+
+    </script>
+	
+</body>
+</html>
+
