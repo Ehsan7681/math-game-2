@@ -33,6 +33,8 @@
             --font-family: 'Vazirmatn', sans-serif;
             --selection-bg: #ffffff;
             --shadow-color: rgba(0, 0, 0, 0.1);
+            --modal-bg: rgba(0, 0, 0, 0.7);
+            --modal-content-bg: #ffffff;
         }
 
         body {
@@ -46,6 +48,7 @@
             margin: 0;
             padding: 2rem 1rem;
             box-sizing: border-box;
+            position: relative;
         }
 
         h1 {
@@ -259,6 +262,84 @@
         .fade-in { animation: fadeIn 0.5s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* استایل پاپ‌آپ */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--modal-bg);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: var(--modal-content-bg);
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: zoomIn 0.3s;
+        }
+
+        @keyframes zoomIn {
+            from {transform: scale(0.7); opacity: 0;}
+            to {transform: scale(1); opacity: 1;}
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .modal-body {
+            margin: 20px 0;
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+
+        .modal-footer {
+            margin-top: 20px;
+        }
+
+        .modal-success .modal-header h2 {
+            color: var(--green);
+        }
+
+        .modal-error .modal-header h2 {
+            color: var(--red);
+        }
+
+        .emoji {
+            font-size: 3rem;
+            margin: 10px 0;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            top: 15px;
+            left: 20px;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+        }
+
         #message {
             margin-top: 15px;
             font-size: 1.2rem;
@@ -306,6 +387,42 @@
         </div>
     </div>
 
+    <!-- پاپ‌آپ تبریک -->
+    <div id="success-modal" class="modal">
+        <div class="modal-content modal-success">
+            <span class="close">&times;</span>
+            <div class="modal-header">
+                <h2>آفرین!</h2>
+            </div>
+            <div class="modal-body">
+                <div class="emoji">🎉</div>
+                <p>شما برنده شدید!</p>
+                <p>عالی کار کردی!</p>
+            </div>
+            <div class="modal-footer">
+                <button id="close-success-modal" class="action-btn">ادامه</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- پاپ‌آپ اخطار -->
+    <div id="error-modal" class="modal">
+        <div class="modal-content modal-error">
+            <span class="close">&times;</span>
+            <div class="modal-header">
+                <h2>اشتباهه!</h2>
+            </div>
+            <div class="modal-body">
+                <div class="emoji">😢</div>
+                <p>دوباره تلاش کن.</p>
+                <p>با دقت بیشتری حل کن!</p>
+            </div>
+            <div class="modal-footer">
+                <button id="close-error-modal" class="action-btn">دوباره</button>
+            </div>
+        </div>
+    </div>
+
     <div id="message"></div>
 
     <script>
@@ -320,6 +437,13 @@
         const checkBtn = document.getElementById('check-btn');
         const restartBtn = document.getElementById('restart-btn');
         const backBtn = document.getElementById('back-btn');
+
+        // --- انتخاب عناصر پاپ‌آپ ---
+        const successModal = document.getElementById('success-modal');
+        const errorModal = document.getElementById('error-modal');
+        const closeSuccessModal = document.getElementById('close-success-modal');
+        const closeErrorModal = document.getElementById('close-error-modal');
+        const closeButtons = document.querySelectorAll('.close');
 
         // --- متغیرهای وضعیت بازی ---
         let selectedDifficulty = null;
@@ -368,6 +492,7 @@
             }
         };
 
+        // --- Event Listeners ---
         document.querySelectorAll('.difficulty-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 selectedDifficulty = e.target.dataset.difficulty;
@@ -387,7 +512,33 @@
         restartBtn.addEventListener('click', startGame);
         checkBtn.addEventListener('click', checkSolution);
         backBtn.addEventListener('click', showMenu);
-        
+
+        // --- Event Listeners برای پاپ‌آپ‌ها ---
+        closeSuccessModal.addEventListener('click', () => {
+            successModal.style.display = 'none';
+        });
+
+        closeErrorModal.addEventListener('click', () => {
+            errorModal.style.display = 'none';
+        });
+
+        closeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                successModal.style.display = 'none';
+                errorModal.style.display = 'none';
+            });
+        });
+
+        // --- بستن پاپ‌آپ با کلیک خارج از آن ---
+        window.addEventListener('click', (event) => {
+            if (event.target === successModal) {
+                successModal.style.display = 'none';
+            }
+            if (event.target === errorModal) {
+                errorModal.style.display = 'none';
+            }
+        });
+
         function startGame() {
             const puzzlePool = puzzles[selectedDifficulty][selectedType];
             const randomIndex = Math.floor(Math.random() * puzzlePool.length);
@@ -480,12 +631,14 @@
                     break;
                 }
             }
+            
             if (isCorrect) {
-                messageEl.textContent = 'آفرین! شما برنده شدید!';
-                messageEl.className = 'success';
+                // نمایش پاپ‌آپ تبریک
+                successModal.style.display = 'block';
+                gameBoard.classList.remove('shake');
             } else {
-                messageEl.textContent = 'اشتباهه! دوباره تلاش کن.';
-                messageEl.className = 'error';
+                // نمایش پاپ‌آپ اخطار
+                errorModal.style.display = 'block';
                 gameBoard.classList.add('shake');
                 setTimeout(() => gameBoard.classList.remove('shake'), 500);
             }
