@@ -349,6 +349,19 @@
         }
         #message.success { color: var(--green); }
         #message.error { color: var(--red); }
+
+        /* اطلاعات طراح */
+        .developer-info {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            font-size: 0.8rem;
+            color: #666;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 5px 10px;
+            border-radius: 10px;
+            z-index: 100;
+        }
     </style>
 </head>
 <body>
@@ -424,6 +437,11 @@
     </div>
 
     <div id="message"></div>
+
+    <!-- اطلاعات طراح -->
+    <div class="developer-info">
+        ایده و تولید: احسان شمسی
+    </div>
 
     <script>
         // --- انتخاب عناصر HTML ---
